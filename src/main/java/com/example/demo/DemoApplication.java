@@ -2,6 +2,7 @@ package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.Environment;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DemoApplication {
 	@Autowired
         private PubsubOutboundGateway messagingGateway;
+        @Autowired private Environment env;
 
         public static void main(String[] args) {
                 SpringApplication.run(DemoApplication.class, args);
@@ -35,6 +37,7 @@ public class DemoApplication {
         @Bean
         @ServiceActivator(inputChannel = "pubsubOutputChannel")
         public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
-                return new PubSubMessageHandler(pubsubTemplate, "test_topic_1");
+
+                return new PubSubMessageHandler(pubsubTemplate, env.getProperty("topic.name", "test_topic"));
         }
 }
